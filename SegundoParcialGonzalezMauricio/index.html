@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Segundo Parcial Laboratorio III</title>
+	<style type="text/css">
+			body{
+		background-color: #FCFCFC;
+	}
+
+	th,td,table{
+		border: 1.5px solid green;
+		border-collapse: collapse;
+		padding: 3px;
+	}
+	table{
+		margin: 20px auto;
+	}
+	#div-formabm{
+		margin: 30px auto;
+		width: 20%;
+		padding: 40px;
+		display: none;
+		align-items: center;
+	}
+
+	#form-abm label, #form-abm input{
+		display: block;
+		width: 100%;
+	}
+
+
+	#btn-agregar{
+		display: block;
+		margin: auto;
+		margin-top: 7px;
+		padding: 10px;
+		background: lightgreen;
+		border: none;
+	}
+
+	#btns-formabm{
+		margin-top: 20px;
+		display: flex;
+		justify-content: space-between;	
+	}
+
+	#btns-formabm button{
+		margin: 10px;
+		padding: 10px;
+		background: lightgreen;
+		border: none;
+	}
+
+	#lbl-mostrarcol {
+		display: block;
+		margin-top: 10px;
+	}
+
+	#form-datos{
+		border: 3px solid black;
+		text-align: center;
+		font-size: 20px;
+		padding: 15px;
+		margin: 30px auto;
+		width: 50%;
+	}
+
+	#div-spinner{
+		position: absolute;
+		display: none;
+		width: 100%;
+		height: 100%;
+		opacity: 0.5;
+	}
+	#div-spinner img{
+		margin: auto;
+	}
+	</style>
+</head>
+<body>
+	<div id= 'div-spinner'>
+		<img src="https://cdn.dribbble.com/users/172519/screenshots/3520576/dribbble-spinner-800x600.gif">
+	</div>
+	<div id='div-table'>
+	</div>
+	<button id='btn-agregar'>Agregar Elemento</button>
+	<div id='div-formabm'>
+		<form id='form-abm'>
+		<label id='titulo-formABM'>Formulario ABM</label><br>
+		<label>TIPO:</label>
+		<select id='select-tipo'>
+			<option></option>
+			<option>Empleado</option>
+			<option>Cliente</option>
+		</select><br>
+		<label>ID:</label>
+		<input type="text" name="id" id='input-id' disabled>
+		<label>Nombre:</label>
+		<input type="text" name="nombre" id='input-nombre' disabled>
+		<label>Apellido:</label>
+		<input type="text" name="apellido" id='input-apellido' disabled>
+		<label>Edad:</label>
+		<input type="text" name="edad" id='input-edad' disabled>
+		<label id='lbl-sueldo'>Sueldo:</label>
+		<input type="text" name="sueldo" id='input-sueldo' disabled>
+		<label id="lbl-ventas">Ventas:</label>
+		<input type="text" name="ventas" id='input-ventas' disabled>
+		<label id="lbl-compras">Compras:</label>
+		<input type="text" name="compras" id='input-compras' disabled>
+		<label id="lbl-telefono">Telefono:</label>
+		<input type="text" name="telefono" id='input-telefono' disabled>
+
+		</form>
+		<div id="btns-formabm">
+		<button id="btn-cancelar">Cancelar</button>
+		<button id="btn-aceptaralta">Aceptar</button>
+		<button id="btn-aceptarmodificar">Aceptar</button>
+		<button id="btn-aceptareliminar">Aceptar</button>
+		</div>
+	</div>
+	<script>
+//clases
+	class Persona{
+		constructor (id,nombre,apellido,edad){
+			this.id = id;
+			this.nombre = nombre;
+			this.apellido = apellido;
+			this.edad = edad;
+		} 
+	}
+
+	class Empleado extends Persona{
+
+		constructor(id,nombre,apellido,edad,sueldo,ventas){
+			super(id,nombre,apellido,edad);
+			this.sueldo = sueldo;
+			this.ventas = ventas;
+		}
+	}
+
+	class Cliente extends Persona{
+
+		constructor(id, nombre,apellido,edad,compras, telefono){
+			super(id,nombre,apellido,edad);
+			this.compras = compras;
+			this.telefono = telefono;
+		}
+	}
+
+	const table = document.getElementsByTagName('table')[0];
+	const tBody = document.createElement('tbody');
+	const tabla = document.createElement('table');
+	const tHead = document.createElement('thead');
+	const trHead = document.createElement('tr');
+	let celdas = document.getElementsByTagName('td');
+
+	const select_tipo= document.getElementById('select-tipo');
+
+	const input_id= document.getElementById('input-id');
+	const input_nombre= document.getElementById('input-nombre');
+	const input_apellido= document.getElementById('input-apellido');
+	const input_edad= document.getElementById('input-edad');
+	const input_sueldo= document.getElementById('input-sueldo');
+	const input_ventas= document.getElementById('input-ventas');
+	const input_compras= document.getElementById('input-compras');
+	const input_telefono= document.getElementById('input-telefono');
+
+	const div_formabm = document.getElementById('div-formabm');
+	const div_table = document.getElementById('div-table');
+	const div_spinner = document.getElementById('div-spinner');
+	const form_abm = document.getElementById('form-abm');
+
+	const btnaceptaralta = document.getElementById('btn-aceptaralta');
+	const btnaceptarmodificar = document.getElementById('btn-aceptarmodificar');
+	const btnaceptareliminar = document.getElementById('btn-aceptareliminar');
+	const btnCancelar = document.getElementById('btn-cancelar');
+	const btnAgregar = document.getElementById('btn-agregar');
+	
+	const lbl_compras = document.getElementById('lbl-compras');
+	const lbl_telefono = document.getElementById('lbl-telefono');
+	const lbl_sueldo = document.getElementById('lbl-sueldo');
+	const lbl_ventas = document.getElementById('lbl-ventas')
+	const titulo_formABM = document.getElementById('titulo-formABM');
+
+	function actualizarTabla(){
+		while(tBody.rows.length > 0) {
+	  		tBody.deleteRow(tBody.rows.length -1);
+		}
+		personas.forEach((p)=>{
+			llenarTabla(p);
+		});
+	}
+
+	function llenarTabla(item){
+		const tr = document.createElement('tr');
+		for (let i = 0; i<trHead.cells.length; i++) {
+			const td = document.createElement('td');
+			td.style.display = trHead.cells[i].style.display;
+			if(item[trHead.cells[i].innerHTML.toLowerCase()]){
+				td.appendChild(document.createTextNode(item[trHead.cells[i].innerHTML.toLowerCase()]));
+			}
+			else if(trHead.cells[i].innerHTML == 'Modificar'){
+				btn = document.createElement('button');
+				btn.setAttribute('id', 'btn-modificar');
+				btn.addEventListener('click',()=>{
+					titulo_formABM.innerHTML = 'MODIFICAR';
+					btnaceptareliminar.style.display = 'none';
+					div_table.style.display = 'none';
+					btnAgregar.style.display = 'none';
+				})
+				btn.appendChild(document.createTextNode('Modificar'));
+				btn.addEventListener('click', cargarDatosForm);
+				td.appendChild(btn);
+			}
+			else if(trHead.cells[i].innerHTML == 'Eliminar'){
+				btn = document.createElement('button');
+				btn.setAttribute('id', 'btn-eliminar');
+				btn.addEventListener('click',()=>{
+					titulo_formABM.innerHTML = 'ELIMINAR';
+					btnaceptarmodificar.style.display = 'none';
+					div_table.style.display = 'none';
+					btnAgregar.style.display = 'none';
+					input_sueldo.disabled = true;
+					input_ventas.disabled = true;
+					input_compras.disabled = true;
+					input_telefono.disabled = true;
+					input_compras.disabled = true;
+					input_sueldo.disabled = true;
+					input_ventas.disabled = true;
+
+				})
+				btn.appendChild(document.createTextNode('Eliminar'));
+				btn.addEventListener('click', cargarDatosForm);
+				td.appendChild(btn);
+			}
+			else{
+				td.appendChild(document.createTextNode('N/A'));
+			}
+				tr.appendChild(td);	
+		}
+		tBody.appendChild(tr);
+	}
+
+	function crearTabla(){
+		const headers = ['ID', 'Nombre', 'Apellido', 'Edad', 'Sueldo', 'Ventas', 'Compras', 'Telefono','Modificar', 'Eliminar'];
+		
+		headers.forEach((h)=>{
+			const th = document.createElement('th');
+			const texto = document.createTextNode(h);
+			th.appendChild(texto);
+			trHead.appendChild(th);
+		}) 
+		tHead.appendChild(trHead);
+		tabla.appendChild(tHead);
+		tabla.appendChild(tBody);
+		document.getElementById('div-table').appendChild(tabla);
+	}
+	
+	function cargarDatosForm(e){
+		if(e.target.innerHTML == 'Eliminar'){
+			btnaceptareliminar.style.display = '';
+		}
+		else if(e.target.innerHTML == 'Modificar')
+			btnaceptarmodificar.style.display = '';
+
+		vaciarForm(form_abm);
+		btnaceptaralta.style.display = 'none';
+		div_formabm.style.display = 'block';
+		let persona = getPersonaByID(e.target.parentElement.parentElement.cells[0].innerHTML);
+		select_tipo.disabled = true;
+		if(persona instanceof Empleado){
+			select_tipo.value = 'Empleado';
+			input_sueldo.value = persona.sueldo;
+			input_ventas.value = persona.ventas;	
+		}
+		else{
+			select_tipo.value = 'Cliente';
+			input_compras.value = persona.compras;
+			input_telefono.value = persona.telefono;	
+		}
+		
+		input_id.value = persona.id;
+		input_nombre.value = persona.nombre;
+		input_nombre.disabled = false;
+		input_apellido.value = persona.apellido;
+		input_apellido.disabled = false;
+		input_edad.value= persona.edad;
+		input_edad.disabled= false;
+		modelarFormABM(select_tipo.value);
+	}
+
+	function filtrarTabla(idsABorrar, idsAMostrar){
+		let rows = tBody.rows;
+		for(let i=0; i<rows.length; i++){
+			idsABorrar.forEach((id)=>{
+				if(rows[i].cells[0].innerHTML == id){
+					rows[i].style.display = 'none';
+				}
+			});
+
+		}
+		for(let i=0; i<rows.length; i++){
+			idsAMostrar.forEach((id)=>{
+				if(rows[i].cells[0].innerHTML == id){
+					rows[i].style.display = '';
+				}
+			});
+		}
+	}
+
+	function buscarColummnaSeleccionada(nombre, row){
+		for(let i=0; i<row.cells.length; i++){
+			if(row.cells[i].innerHTML.toLowerCase() == nombre.toLowerCase()){
+				return i;
+			}
+		}
+		return false;
+	}
+
+	function getPersonaByID(id){
+		for (let i =0; i<personas.length; i++) {
+			if(personas[i].id == id){
+				return personas[i];
+			}
+		}
+		return false;
+	}
+
+	function vaciarForm(form){
+		for (let i=0; i<form.elements.length; i++) {
+			form.elements[i].value = '';
+			if(form.elements[i].type != 'select-one' && form.elements[i].type != 'submit')
+				form.elements[i].disabled = true;
+			else
+				form.elements[i].disabled = false;
+		}
+	}
+
+	function validarCampos(form){
+		for (let i=0; i<form.elements.length; i++) {
+			if(form.elements[i].type == 'text' && !form.elements[i].disabled){
+				if(form.elements[i].value != ''){
+				switch(form.elements[i].id){
+				case 'input-nombre':	
+				case 'input-apellido':
+				case 'input-sueldo':
+
+					if(!isNaN(form.elements[i].value) || form.elements[i].value.trim() == '') return false;  
+					break;
+				case 'input-edad':
+				case 'input-telefono':
+					if(isNaN(form.elements[i].value) || form.elements[i].value%1 != 0 || form.elements[i].value<0 || (form.elements[i].value.length<4 && form.elements[i].value <16)) return false;
+					break;
+				case 'input-ventas':
+				case 'input-compras':
+					if(isNaN(form.elements[i].value)) return false;
+					break;
+				}
+				}
+				else{
+					return false;
+				}
+			}
+			else if(form.elements[i].type == 'select-one' && form.elements[i].value == '') return false;
+		}
+		return true;
+	}
+
+	function modelarFormABM(tipo){
+		if(tipo == 'Empleado'){
+			input_sueldo.disabled = false;
+			input_ventas.disabled = false;		
+			input_compras.style.display = 'none';
+			input_telefono.style.display = 'none';
+			input_sueldo.style.display = '';
+			input_ventas.style.display = '';
+			lbl_compras.style.display = 'none';
+			lbl_telefono.style.display = 'none';
+			lbl_sueldo.style.display = '';
+			lbl_ventas.style.display = '';
+		}
+		else if(tipo == 'Cliente'){
+			
+			input_compras.disabled = false;
+			input_telefono.disabled = false;	
+			input_sueldo.style.display = 'none';
+			input_ventas.style.display = 'none';
+			input_compras.style.display = '';
+			input_telefono.style.display = '';
+			lbl_sueldo.style.display = 'none';
+			lbl_ventas.style.display = 'none';
+			lbl_compras.style.display = '';
+			lbl_telefono.style.display = '';
+		}
+		else if(tipo == null){
+			
+			input_sueldo.style.display = 'none';
+			input_ventas.style.display = 'none';
+			input_compras.style.display = 'none';
+			input_telefono.style.display = 'none';
+			lbl_sueldo.style.display = 'none';
+			lbl_ventas.style.display = 'none';
+			lbl_compras.style.display = 'none';
+			lbl_telefono.style.display = 'none';
+			input_compras.style.display = 'none';
+			input_telefono.style.display = 'none';
+			input_sueldo.style.display = 'none';
+			input_ventas.style.display = 'none';
+			lbl_compras.style.display = 'none';
+			lbl_telefono.style.display = 'none';
+			lbl_sueldo.style.display = 'none';
+			lbl_ventas.style.display = 'none';
+		}
+	}
+
+	btnAgregar.addEventListener('click', (e)=>{
+		vaciarForm(form_abm);
+		modelarFormABM(null);
+		titulo_formABM.innerHTML = 'ALTA';
+		btnaceptaralta.style.display = '';
+		btnaceptarmodificar.style.display = 'none';
+		btnaceptareliminar.style.display = 'none';
+		btnCancelar.style.display = '';
+		div_formabm.style.display = 'block';
+		e.target.style.display = 'none';
+		div_table.style.display = 'none';
+	});
+
+	btnCancelar.addEventListener('click',(e)=>{
+		e.preventDefault();
+		div_formabm.style.display = 'none';
+		btnAgregar.style.display = '';
+		div_table.style.display = '';
+		vaciarForm(form_abm);
+
+	})
+
+	btnaceptaralta.addEventListener('click', (e)=>{
+		const respuesta = alta();
+	});
+
+	btnaceptarmodificar.addEventListener('click', (e)=>{
+		const response = modificar(); 
+	});
+
+	btnaceptareliminar.addEventListener('click', (e)=>{
+		const response = eliminar();
+	});
+
+	select_tipo.addEventListener('change', (e)=>{
+	 	input_nombre.disabled = false;
+	 	input_apellido.disabled = false;
+	 	input_edad.disabled = false;
+	 	modelarFormABM(e.target.value);
+	 	switch(e.target.value){
+	 	case 'Empleado':
+	 		input_sueldo.disabled = false;
+	 		input_ventas.disabled = false;
+	 		input_compras.disabled = true;
+	 		input_telefono.disabled = true;
+	 		break;
+	 	case 'Cliente':
+	 		input_compras.disabled = false;
+	 		input_telefono.disabled = false;
+	 		input_sueldo.disabled = true;
+	 		input_ventas.disabled = true;
+	 		break;
+	 	default:
+	 		vaciarForm(form_abm);
+	 		break;
+	 	} 	
+	 });
+
+	var xhttp = new XMLHttpRequest();
+	btnAgregar.style.display = 'none';
+	xhttp.onreadystatechange = function() {
+	    if (xhttp.readyState == 4 && xhttp.status == 200) {
+	    	btnAgregar.style.display = '';
+	    	personas = JSON.parse(xhttp.response);
+		
+			crearTabla();
+
+			personas.forEach((p)=>{
+				if(p.sueldo){
+					Object.setPrototypeOf(p, new Empleado(p.id, p.nombre, p.apellido, p.edad,p.sueldo ,p.ventas));
+				}
+				else{
+					Object.setPrototypeOf(p,new Cliente(p.id, p.nombre, p.apellido, p.edad,p.compras ,p.telefono));
+				}
+				llenarTabla(p);
+			});
+		}
+	}; 
+
+	xhttp.open("GET", "http://localhost/LaboratorioIII/back.php", true);
+	xhttp.setRequestHeader('Content-type', 'application/json');
+	xhttp.send();
+
+		const alta = function(){
+			if(!validarCampos(form_abm)){
+				alert('Algun dato no es valido o esta incompleto');
+				return;
+			}
+			mostrarSpinner();
+
+			if(select_tipo.value == 'Empleado'){
+	 			data = {
+	 				nombre : input_nombre.value, 
+	 				apellido : input_apellido.value,
+	 				edad : input_edad.value, 
+	 				sueldo : input_sueldo.value, 
+	 				ventas : input_ventas.value
+	 			};
+	 		}
+	 		else{
+	 			data = {
+	 				nombre : input_nombre.value, 
+	 				apellido : input_apellido.value,
+	 				edad : input_edad.value, 
+	 				compras : input_compras.value, 
+	 				telefono : input_telefono.value
+	 			};
+	 		}
+
+			const response = fetch("http://localhost/LaboratorioIII/back.php", {
+		    method: 'PUT',
+		    headers: {
+		      'Content-Type': 'application/json'
+		    },
+		    body: JSON.stringify(data)
+		  });
+
+			response.then(info => info.json())
+  			.then((obj)=>{
+  				div_spinner.style.display = 'none';
+	 		
+	 		  	if(input_sueldo.value !== ''){
+				personas.push(new Empleado(obj.id, data['nombre'], data['apellido'], data['edad'], data['sueldo'], data['ventas']));
+				}
+				else{
+				personas.push(new Cliente(obj.id, data['nombre'], data['apellido'], data['edad'], data['compras'], data['telefono']));
+				}
+				actualizarTabla();
+				div_formabm.style.display = 'none';
+				div_table.style.display = '';
+				vaciarForm(form_abm);
+				btnAgregar.style.display = '';
+  			}).catch((e)=>{
+  				alert('No se pudo realizar la operacion');
+  				div_formabm.style.display = 'none';
+				btnAgregar.style.display = '';
+				div_table.style.display = '';
+				vaciarForm(form_abm);
+				div_spinner.style.display = 'none';
+  			});
+		}
+
+	const modificar = async function(){
+		if(validarCampos(form_abm)){
+			mostrarSpinner();
+			if(select_tipo.value == 'Empleado'){
+ 			data = {
+ 				id: input_id.value,
+ 				nombre : input_nombre.value, 
+ 				apellido : input_apellido.value,
+ 				edad : input_edad.value, 
+ 				sueldo : input_sueldo.value, 
+ 				ventas : input_ventas.value
+ 			};
+ 		}
+ 		else{
+ 			data = {
+ 				id: input_id.value,
+ 				nombre : input_nombre.value, 
+ 				apellido : input_apellido.value,
+ 				edad : input_edad.value, 
+ 				compras : input_compras.value, 
+ 				telefono : input_telefono.value
+ 			};
+ 		}
+
+ 		const response = await fetch("http://localhost/LaboratorioIII/back.php", {
+		    method: 'POST',
+		    headers: {
+		      'Content-Type': 'application/json'
+		    },
+		    body: JSON.stringify(data)
+		 });
+ 			obj = await response;
+ 			if(obj.status != 200){
+ 				alert('Error. No se pudo realizar la operacion');
+ 				desaparecerSpinner();
+ 				div_formabm.style.display = 'none';
+ 				vaciarForm(form_abm);
+ 				btnAgregar.style.display = '';
+				div_table.style.display = '';
+				div_formabm.style.display = 'none';
+ 				return;
+ 			}
+ 			else{
+ 				let persona = getPersonaByID(input_id.value);
+			 	if(persona){	 		
+			 		persona.nombre = input_nombre.value;
+			 		persona.edad = input_edad.value;
+			 		persona.apellido = input_apellido.value;
+			 		if(persona instanceof Empleado){
+			 			persona.sueldo = input_sueldo.value;
+			 			persona.ventas = input_ventas.value;
+			 		}
+			 		else{
+			 			persona.compras = input_compras.value;
+			 			persona.telefono = input_telefono.value;
+			 		}
+			 		vaciarForm(form_abm);
+			 	}
+			 	else{
+					alert("ERROR");
+			 	}
+
+				actualizarTabla();
+				div_spinner.style.display = 'none';
+				vaciarForm(form_abm);
+				btnAgregar.style.display = '';
+				div_table.style.display = '';
+				div_formabm.style.display = 'none';
+				}
+			}
+			else{
+				alert('Algun dato no es valido o esta incompleto');
+			}	
+	}
+	
+	const eliminar = function(e){
+		data = {
+			id : input_id.value
+		}
+		mostrarSpinner();
+		const response = fetch("http://localhost/LaboratorioIII/back.php", {
+		    method: 'DELETE',
+		    headers: {
+		      'Content-Type': 'application/json'
+		    },
+		    body: JSON.stringify(data)
+		  })
+			response.then(info => {
+				if(info.status != 200){
+					desaparecerSpinner();
+					vaciarForm(form_abm);
+					btnAgregar.style.display = '';
+					div_table.style.display = '';
+					div_formabm.style.display = 'none';
+					alert('Error. No se pudo realizar la operacion');
+				}
+				else{
+					let persona = getPersonaByID(input_id.value);
+					let indice = -1;
+					for(let i=0;i<personas.length;i++){
+						if(personas[i] == persona){
+							indice = i;
+						}
+					}
+					desaparecerSpinner();
+					personas.splice(indice,1);
+					actualizarTabla();
+					vaciarForm(form_abm);
+					btnAgregar.style.display = '';
+					div_table.style.display = '';
+					div_formabm.style.display = 'none';
+				}
+
+				input_sueldo.disabled = false;
+				input_ventas.disabled = false;
+				input_compras.disabled = false;
+				input_telefono.disabled = false;
+				input_compras.disabled = false;
+				input_sueldo.disabled = false;
+				input_ventas.disabled = false;
+
+			})
+	}
+
+	function mostrarSpinner(){
+		div_spinner.style.display = 'flex';
+	}
+
+	function desaparecerSpinner(){
+		div_spinner.style.display = 'none';
+	}
+	</script>
+    
+</body>
+</html>
