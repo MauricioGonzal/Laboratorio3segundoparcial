@@ -346,14 +346,13 @@
 				switch(form.elements[i].id){
 				case 'input-nombre':	
 				case 'input-apellido':
-				case 'input-sueldo':
-
 					if(!isNaN(form.elements[i].value) || form.elements[i].value.trim() == '') return false;  
 					break;
 				case 'input-edad':
 				case 'input-telefono':
 					if(isNaN(form.elements[i].value) || form.elements[i].value%1 != 0 || form.elements[i].value<0 || (form.elements[i].value.length<4 && form.elements[i].value <16)) return false;
 					break;
+				case 'input-sueldo':
 				case 'input-ventas':
 				case 'input-compras':
 					if(isNaN(form.elements[i].value)) return false;
